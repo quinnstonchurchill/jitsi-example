@@ -16,6 +16,12 @@ const Participant = types
   .views(self => ({
     hasVideoTrack() {
       return self.tracks && self.tracks.video;
+    },
+    hasAudioTrack() {
+      return self.tracks && self.tracks.audio;
+    },
+    hasTracks() {
+      return Boolean(self.tracks);
     }
   }))
   .actions(self => ({

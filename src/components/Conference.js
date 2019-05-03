@@ -21,15 +21,29 @@ const shouldRenderVideo = (video, waitForVideoStarted) =>
 
 class Conference extends React.Component {
   video = React.createRef();
+  audio = React.createRef();
   async componentDidMount() {
     await this.props.connectionStore.connect();
+    const dominantParticipantVideoTrack = this.getDominantVideoStream();
+    this.attachVideo(dominantParticipantVideoTrack);
+    // TODO maybe do this without updating
     this.forceUpdate();
   }
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     const dominantParticipantVideoTrack = this.getDominantVideoStream();
-    // ! dominantParticipant = null
     this.attachVideo(dominantParticipantVideoTrack);
+
+    // const { audio, video } = this.getDominantTracks();
+    // video.attach(this.video.current);
+    // audio.attach(this.audio.current);
   }
+  attachAudio = track => {
+    if (!track) {
+      return;
+    }
+
+    track.attach(this.audio.current);
+  };
   attachVideo = track => {
     if (!track) {
       console.log('no track');
@@ -39,6 +53,22 @@ class Conference extends React.Component {
     console.log('track exists');
     track.attach(this.video.current);
   };
+  getDominantTracks = () => {
+    const { participantStore } = this.props.connectionStore.conference;
+
+    const dominantTracks =
+      participantStore.dominantParticipant &&
+      participantStore.dominantParticipant.hasTracks() &&
+      participantStore.dominantParticipant.tracks;
+    console.log(dominantTracks);
+
+    return {
+      audio: dominantTracks.audio.jitsiTrack,
+      video: dominantTracks.video.jitsiTrack
+    };
+  };
+  // TODO
+  getDominantAudioStream = () => {};
   getDominantVideoStream = () => {
     const participantStore = this.props.connectionStore.conference
       .participantStore;
@@ -60,6 +90,7 @@ class Conference extends React.Component {
     return (
       <Flex flexDirection="column" alignItems="center">
         <video autoPlay ref={this.video} />
+        <audio autoPlay ref={this.audio} />
         <Button
           backgroundColor="red"
           onClick={this.props.connectionStore.disconnect}
