@@ -23,7 +23,7 @@ const connectionOptions = {
     focus: 'focus.meet.jit.si'
   },
   // FIXME: use xep-0156 for that
-  bosh: '//meet.jit.si/http-bind',
+  bosh: 'http://meet.jit.si/http-bind?room=boof',
   // The name of client node advertised in XEP-0115 'c' stanza
   clientNode: 'http://jitsi.org/jitsimeet',
   // ! deprecated desktop sharing settings, included only because older version of jitsi-meet require them
