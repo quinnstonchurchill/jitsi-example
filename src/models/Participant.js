@@ -33,10 +33,9 @@ const Participant = types
       self.tracks = {};
     },
     addTracks(tracks) {
-      console.log(tracks);
-      for (let i = 0; i < tracks.length; i++) {
-        self.addTrack(tracks[i]);
-      }
+      tracks.forEach(track => {
+        self.addTrack(track);
+      });
     }
   }));
 // .postProcessSnapshot(snapshot => {

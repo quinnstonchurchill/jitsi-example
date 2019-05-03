@@ -138,7 +138,7 @@ export async function createEnvironment() {
       shard: 'meet-jit-si-us-east-1a-s0',
       region: 'us-east-1',
       userRegion: 'us-east-1',
-      crossRegion: !'us-east-1' || 'us-east-1' === 'us-east-1' ? 0 : 1
+      crossRegion: !'us-east-1'
     },
     rttMonitor: {
       enabled: false,

@@ -8,7 +8,7 @@ const ParticipantStore = types
   .model('ParticipantStore')
   .props({
     participants: types.map(Participant),
-    dominantParticipant: types.maybe(types.reference(Participant))
+    dominantParticipant: types.maybeNull(types.reference(Participant))
   })
   .views(self => ({
     getParticipant(id) {
@@ -45,7 +45,6 @@ const ParticipantStore = types
     setDominantParticipant(id) {
       console.log('setting dominant participant');
       if (self.participants.has(id)) {
-        console.log(id);
         self.dominantParticipant = id;
       } else {
         console.log(`user ${id} not found!!`);

@@ -19,6 +19,7 @@ const ConferenceStore = types
   })
   .actions(self => ({
     addTracks(tracks) {
+      console.log('addTracks');
       for (let i = 0; i < tracks.length; i++) {
         self.participantStore.addTrackForParticipant(
           tracks[i].participantId,
@@ -29,6 +30,7 @@ const ConferenceStore = types
   }))
   .actions(self => ({
     onConferenceJoined() {
+      console.log('onConferenceJoined');
       const localParticipantId =
         self.conference.p2pDominantSpeakerDetection.myUserID;
 
@@ -69,6 +71,7 @@ const ConferenceStore = types
         _isLocal: false,
         _connectionStatus: user._connectionStatus
       };
+
       self.participantStore.addParticipant(participant, null);
     },
     onDominantSpeakerChanged(id, room) {
@@ -83,14 +86,6 @@ const ConferenceStore = types
         self.joining = false;
       }
       console.log(`Conference Failed: ${error}`);
-      if (!error.recoverable) {
-        const { callUUID } = self.conference;
-
-        if (callUUID) {
-          delete self.conference.callUUID;
-          self.callIntegration.endCall(callUUID);
-        }
-      }
     },
     onConferenceError(error) {
       console.log(`Conference Failed: ${error}`);
@@ -115,11 +110,6 @@ const ConferenceStore = types
     }
   }))
   .actions(self => ({
-    onPerformEndCallAction({ callUUID }) {
-      if (self.conference && self.conference.callUUID === callUUID) {
-        delete self.conference.callUUID;
-      }
-    },
     createLocalTracks: flow(function* createLocalTracks() {
       const jitsiMeet = getEnv(self).jitsiMeet;
       const tracks = yield jitsiMeet.createLocalTracks({
@@ -161,10 +151,14 @@ const ConferenceStore = types
     createConference(room) {
       self.joining = true;
       const connection = getRoot(self).connectionStore.getConnection();
+
+      // bind room to Conference & create cofference
       self.room = room;
       self.conference = connection.initJitsiConference(room, {
         openBridgeChannel: true
       });
+
+      // conference event handlers
       self.conference.on(ConferenceEvents.TRACK_ADDED, self.onTrackAdded);
       self.conference.on(ConferenceEvents.TRACK_REMOVED, self.onTrackRemoved);
       self.conference.on(
@@ -194,6 +188,7 @@ const ConferenceStore = types
       //   self.onMessageReceived
       // );
 
+      // join conference as Participant
       self.conference.join();
     },
     cleanUp() {
@@ -202,7 +197,6 @@ const ConferenceStore = types
 
       self.participantStore.cleanUp();
       const conference = self.conference;
-      self.conference = null;
 
       conference.off(ConferenceEvents.CONFERENCE_ERROR, self.onConferenceError);
       conference.off(
@@ -227,9 +221,15 @@ const ConferenceStore = types
       );
       // conference.off(ConferenceEvents.MESSAGE_RECEIVED, self.onMessageReceived);
 
-      conference.leave().catch(e => {
-        console.log(e);
-      });
+      conference
+        .leave()
+        .then(() => {
+          console.log('left');
+          self.conference = null;
+        })
+        .catch(e => {
+          console.log(e);
+        });
     }
   }));
 // .postProcessSnapshot(snapshot => {
