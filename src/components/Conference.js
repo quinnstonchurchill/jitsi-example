@@ -24,18 +24,16 @@ class Conference extends React.Component {
   audio = React.createRef();
   async componentDidMount() {
     await this.props.connectionStore.connect();
-    const dominantParticipantVideoTrack = this.getDominantVideoStream();
-    this.attachVideo(dominantParticipantVideoTrack);
-    // TODO maybe do this without updating
-    this.forceUpdate();
+    // const dominantParticipantVideoTrack = this.getDominantVideoStream();
+    // this.attachVideo(dominantParticipantVideoTrack);
   }
+  // TODO move to componentDidMount()
   componentDidUpdate() {
-    const dominantParticipantVideoTrack = this.getDominantVideoStream();
-    this.attachVideo(dominantParticipantVideoTrack);
-
-    // const { audio, video } = this.getDominantTracks();
-    // video.attach(this.video.current);
-    // audio.attach(this.audio.current);
+    // const dominantParticipantVideoTrack = this.getDominantVideoStream();
+    // this.attachVideo(dominantParticipantVideoTrack);
+    const { audio, video } = this.getDominantTracks();
+    video.attach(this.video.current);
+    audio.attach(this.audio.current);
   }
   attachAudio = track => {
     if (!track) {
